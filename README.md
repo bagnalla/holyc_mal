@@ -38,7 +38,7 @@ mal("prog.mal");
 ## Implementation info
 
 All tests pass and self-hosting is successful
-([dramatized proof](https://www.youtube.com/watch?v=tbr-j2_zhgU)).
+([dramatized proof](https://www.youhttps://github.com/bagnalla/holyc_mal/issuestube.com/watch?v=tbr-j2_zhgU)).
 The only real thing missing at the moment is HolyC interop. 
 
 The garbage collector uses a simple mark and sweep strategy, using the
@@ -67,3 +67,9 @@ necessary to rewrite functions to be tail-recursive when it wouldn't be an
 issue in other implementations. I haven't found a way to increase the stack
 size yet -- it may actually require a patch to the HolyC compiler or OS.
 
+
+## Performance benchmarks
+Running in a VirtualBox VM. CPU is i7-4790k.
+- perf1.mal: 11 ms
+- perf2.mal: 66 ms
+- perf3.mal: 192 iters/s
