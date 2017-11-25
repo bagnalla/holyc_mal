@@ -38,7 +38,7 @@ mal("prog.mal");
 ## Implementation info
 
 All tests pass and self-hosting is successful
-([dramatized demonstration](https://www.youhttps://github.com/bagnalla/holyc_mal/issuestube.com/watch?v=tbr-j2_zhgU)).
+([dramatized demonstration](https://www.youtube.com/watch?v=tbr-j2_zhgU)).
 The only real thing missing at the moment is HolyC interop. 
 
 The garbage collector uses a simple mark and sweep strategy, using the
