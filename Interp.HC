@@ -357,7 +357,7 @@ Malval *EVAL(Env *env, Malval *ast)
 
 	  // quit!
 	  if (StringEqC(v1->_atom->_str, "quit!")) {
-	    throws("quit!");
+	    throws("Terminating Mal.");
 	  }
 
 	  // def!
@@ -544,6 +544,7 @@ Malval *EVAL(Env *env, Malval *ast)
 	      ast = EVAL(env, body);
 	    }
 	    catch {
+              "trycatch\n";
 	      CatchException; // Stop it from bubbling up
 	      e = GetException;
 	      val = ExceptionMalval(e);
@@ -644,11 +645,15 @@ Env *_init_env()
   return env;
 }
 
-VOID rep(Env *env, String *s, BOOL print)
+// TODO: refactor to handle quit! more properly to actually
+// exit the program instead of letting the exception bubble up
+// to the top.
+BOOL rep(Env *env, String *s, BOOL print)
 {
   Malval *ast_in = NULL, *ast_out = NULL;
   String *res = NULL;
   Exception *e;
+  BOOL exit = FALSE;
   try {
     ast_in = READ(s);
     ast_out = EVAL(env, ast_in);
@@ -661,12 +666,11 @@ VOID rep(Env *env, String *s, BOOL print)
     e = GetException;
     res = ExceptionString(e);
     StringPrintLn(res);
+    CatchException;
     ExceptionDelete(e);
-    if (!StringEqC(res, "quit!"))
-      CatchException;
-    else // Exit program on "quit!"
-      RethrowException;
+    exit = StringEqC(res, "quit!");
   }
+  return exit;
 }
 
 INT mal(...)
@@ -722,8 +726,10 @@ INT mal(...)
       cstr = GetStr("user> ");
       s = StringMk(cstr);
       Free(cstr);
-      if (!StringEqC(s, ""))
-	rep(env, s, TRUE);
+      if (!StringEqC(s, "")) {
+	if (rep(env, s, TRUE))
+	  break;
+      }
     }
   }
 

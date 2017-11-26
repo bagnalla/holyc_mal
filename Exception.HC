@@ -68,14 +68,16 @@ Exception *ExceptionMalvalMk(Malval *v)
 CHAR *throws(CHAR *str)
 {
   Exception *e = ExceptionCStringMk(str);
-  throw(e);
+  // throw with no_log=TRUE. It seems to hang up sometimes otherwise,
+  // presumably somehow due to treating bytes of the pointer as chars.
+  throw(e, TRUE);
   return 0; // make compiler stfu
 }
 
 CHAR *throwval(Malval *val)
 {
   Exception *e = ExceptionMalvalMk(val);
-  throw(e);
+  throw(e, TRUE);
   return 0; // make compiler stfu
 }
 
