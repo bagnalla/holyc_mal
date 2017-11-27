@@ -357,7 +357,7 @@ Malval *EVAL(Env *env, Malval *ast)
 
 	  // quit!
 	  if (StringEqC(v1->_atom->_str, "quit!")) {
-	    throws("Terminating Mal.");
+	    throws("quit!");
 	  }
 
 	  // def!
@@ -544,7 +544,6 @@ Malval *EVAL(Env *env, Malval *ast)
 	      ast = EVAL(env, body);
 	    }
 	    catch {
-              "trycatch\n";
 	      CatchException; // Stop it from bubbling up
 	      e = GetException;
 	      val = ExceptionMalval(e);
@@ -645,9 +644,6 @@ Env *_init_env()
   return env;
 }
 
-// TODO: refactor to handle quit! more properly to actually
-// exit the program instead of letting the exception bubble up
-// to the top.
 BOOL rep(Env *env, String *s, BOOL print)
 {
   Malval *ast_in = NULL, *ast_out = NULL;
@@ -665,10 +661,11 @@ BOOL rep(Env *env, String *s, BOOL print)
   catch {
     e = GetException;
     res = ExceptionString(e);
-    StringPrintLn(res);
     CatchException;
     ExceptionDelete(e);
     exit = StringEqC(res, "quit!");
+    if (exit) "Exiting Mal.\n";
+    else StringPrintLn(res);
   }
   return exit;
 }
