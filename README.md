@@ -1,5 +1,5 @@
-# holyc_mal
-[Mal](https://github.com/kanaka/mal) for TempleOS. Developed on TempleOS v5.03 running in VirtualBox.
+# [Mal](https://github.com/kanaka/mal) for TempleOS.
+Developed on TempleOS v5.03 running in VirtualBox.
 
 ## Installation
 
