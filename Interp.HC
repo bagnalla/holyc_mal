@@ -717,8 +717,8 @@ INT mal(...)
     StringClear(s);
   }
   else {
-    "Mal [HolyC]\n";
     check_for_GC;
+    "Mal [HolyC]\n";
     while (TRUE) {
       cstr = GetStr("user> ");
       s = StringMk(cstr);

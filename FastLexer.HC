@@ -2,8 +2,8 @@
 #define FAST_LEXER_HC
 
 // Hand-rolled lexer written specifically for Mal. Should be much faster
-// than the general lexer that uses greedy matching of regexes in a dumb
-// way.
+// than the general lexer in Lexer.HC that uses greedy matching of regexes
+// in a dumb way.
 
 // Token indices
 #define WHITESPACE   0

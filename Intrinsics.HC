@@ -13,8 +13,8 @@
 #include "Types.HC"
 #include "Util.HC"
 
-// The first argument is always the symbol of the function
-// The arguments are assumed to be a Mal list
+// The first argument is always the symbol of the function.
+// The arguments are assumed to be a Mal list.
 
 extern VOID _bindEnv(Env *env, PArray *binders, Malval *ast);
 extern Malval *mkQuote(Malval *v);

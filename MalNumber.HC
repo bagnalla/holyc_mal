@@ -1,4 +1,4 @@
-// Functions for working with list Malvals
+// Functions for working with number Malvals
 
 #ifndef MALNUMBER_HC
 #define MALNUMBER_HC
