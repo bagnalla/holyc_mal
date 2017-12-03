@@ -1,6 +1,9 @@
 #ifndef INTERP_HC
 #define INTERP_HC
 
+Option(OPTf_WARN_UNUSED_VAR, FALSE);
+Option(OPTf_WARN_HEADER_MISMATCH, FALSE);
+
 #include "Core.HC"
 #include "Env.HC"
 #include "GC.HC"
@@ -733,5 +736,8 @@ INT mal(...)
   cleanup_GC;
   return 0;
 }
+
+Option(OPTf_WARN_UNUSED_VAR, TRUE);
+Option(OPTf_WARN_HEADER_MISMATCH, TRUE);
 
 #endif

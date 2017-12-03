@@ -8,7 +8,8 @@
 String *unescapeString(String *s)
 {
   INT i;
-  CHAR c;
+  /* CHAR c; */
+  INT c; // suppress warning about 64-bit register
   String *unescaped = StringEmpty;
   for (i = 0; i < StringLen(s); ++i) {
     c = StringGet(s, i);

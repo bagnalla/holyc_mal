@@ -11,8 +11,6 @@
 
 extern class Malval;
 extern Malval *MalvalCopy(Malval *m);
-extern BOOL MalIsString(Malval *m);
-extern BOOL MalIsKeyword(Malval *m);
 extern String *StringOfMalval(Malval *m);
 extern BOOL MalvalEqual(Malval *m1, Malval *m2);
 

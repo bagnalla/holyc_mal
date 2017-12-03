@@ -473,7 +473,8 @@ Regex *_factor()
 
 Regex *_base()
 {
-  CHAR esc;
+  /* CHAR esc; */
+  INT esc; // suppress warning about 64-bit register
   Regex *r;
   switch (_peek) {
   case '(': {

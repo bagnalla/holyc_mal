@@ -71,7 +71,8 @@ Token *ReaderNext(Reader *r)
 String *escapeString(String *s)
 {
   INT i;
-  CHAR c;
+  /* CHAR c; */
+  INT c; // suppress warning about 64-bit register
   String *escaped = StringEmpty;
   for (i = 0; i < StringLen(s); ++i) {
     c = StringGet(s, i);
@@ -104,7 +105,9 @@ Malval *ReaderReadAtom(Reader *r)
 {
   Token *t = ReaderNext(r);
   NullCheck(t, "token");
-  CHAR c = StringGet(t->s, 0);
+  /* CHAR c = StringGet(t->s, 0); */
+  // suppress warning about 64-bit register
+  INT c = StringGet(t->s, 0);
   Malval *result = NULL;
   String *s, *escaped;
   List *l;

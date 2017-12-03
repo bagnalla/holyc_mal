@@ -19,7 +19,9 @@
 
 Token *_matchWhitespace(String *s, INT *cur)
 {
-  CHAR c = StringGet(s, *cur);
+  /* CHAR c = StringGet(s, *cur); */
+  // suppress warning about 64-bit register
+  INT c = StringGet(s, *cur);
   String *_s;
   switch (c) {
   case ' ':
@@ -51,7 +53,9 @@ Token *_matchSpecialTwo(String *s, INT *cur)
 
 Token *_matchSpecialOne(String *s, INT *cur)
 {
-  CHAR c = StringGet(s, *cur);
+  /* CHAR c = StringGet(s, *cur); */
+  // suppress warning about 64-bit register
+  INT c = StringGet(s, *cur);
   String *_s;
   switch (c) {
   case '[': case ']': case '{': case '}': case '(':
@@ -68,7 +72,9 @@ Token *_matchSpecialOne(String *s, INT *cur)
 Token *_matchQuote(String *s, INT *cur)
 {
   INT local_cur = *cur;
-  CHAR c = StringGet(s, local_cur++);
+  /* CHAR c = StringGet(s, local_cur++); */
+  // suppress warning about 64-bit register
+  INT c = StringGet(s, local_cur++);
   String *acc = StringMk("\"");
   if (c == '"') {
     while (local_cur < StringLen(s)) {
@@ -117,7 +123,9 @@ BOOL isOtherChar(CHAR c)
 Token *_matchComment(String *s, INT *cur)
 {
   INT local_cur = *cur;
-  CHAR c = StringGet(s, local_cur++);
+  /* CHAR c = StringGet(s, local_cur++); */
+  // suppress warning about 64-bit register
+  INT c = StringGet(s, local_cur++);
   String *acc = StringEmpty;
   if (c == ';') {
     while (local_cur < StringLen(s)) {
@@ -136,7 +144,9 @@ Token *_matchComment(String *s, INT *cur)
 Token *_matchOther(String *s, INT *cur)
 {
   INT local_cur = *cur;
-  CHAR c = StringGet(s, local_cur++);
+  /* CHAR c = StringGet(s, local_cur++); */
+  // suppress warning about 64-bit register
+  INT c = StringGet(s, local_cur++);
   String *acc = StringEmpty;
   if (isOtherChar(c)) {
     StringAppend(acc, c);

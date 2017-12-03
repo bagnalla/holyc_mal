@@ -28,7 +28,6 @@ CHAR *PArrayGet(PArray *pa, INT i)
 }
 
 extern VOID GC_mark_object(GCCommon *o);
-extern VOID _print_GC_object(GCCommon *o);
 VOID PArrayGCMark(PArray *p)
 {
   /* PArray *p = pa(PArray*); */

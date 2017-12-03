@@ -119,7 +119,7 @@ Malval *MalListConcat(Malval *l1, Malval *l2)
   }
 }
 
-BOOL MalIsVector(Malval*);
+extern BOOL MalIsVector(Malval*);
 Malval *MalListOfVector(Malval *vec)
 {
   NullCheck(vec, "vector");
