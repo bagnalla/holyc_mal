@@ -1,6 +1,18 @@
 # [Mal](https://github.com/kanaka/mal) for TempleOS.
 Developed on TempleOS v5.03 running in VirtualBox.
 
+## Easy setup
+
+A Docker image is available and can be run with the following command:
+
+```
+sudo docker run -it --privileged --rm -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v /root/.Xauthority:/root/.Xauthority:rw bagnalla/mal-holyc:v1
+```
+
+If you see something like "could not initialize SDL", run the command `xhost +` and try again. Afterward, do `xhost -` to restore the original setting.
+
+If you don't wish to use the Docker image, follow the steps below.
+
 ## Installation
 
 Here is one way to copy the files over to a TOS installation using qemu-nbd.
@@ -66,6 +78,9 @@ TempleOS, so the maximum recursion depth is limited. It may sometimes be
 necessary to rewrite functions to be tail-recursive when it wouldn't be an
 issue in other implementations. I haven't found a way to increase the stack
 size yet -- it may actually require a patch to the HolyC compiler or OS.
+
+I haven't yet found the analogue to ctrl+D in TempleOS, so there is a 'quit!' special form for exiting the REPL.
+Just type '(quit!)'.
 
 
 ## Performance benchmarks
