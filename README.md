@@ -42,7 +42,7 @@ sudo qemu-nbd -d /dev/nbd0
 
 ## Running Mal
 
-Just include the file "Interp.HC" at the command line to bring Mal into scope.
+Include the file "Interp.HC" at the command line to bring Mal into scope.
 
 Run the REPL:
 ```
