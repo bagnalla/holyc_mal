@@ -185,7 +185,6 @@ VOID StringPrintLn(String *s)
   Free(c);
 }
 
-// TODO: figure out how to do this in TempleOS
 INT StringReadLn(String *s)
 {
   NullCheck(s, "string");
@@ -220,14 +219,12 @@ BOOL StringEqC(String *s1, CHAR *s2)
   return eq;
 }
 
-// TODO: figure this out for TempleOS
 INT Atoi(String *s)
 {
   CHAR *c = StringCString(s);
   INT n = Str2I64(c);
   Free(c);
   return n;
-  return 0;
 }
 
 String *StringAddQuotes(String *s)

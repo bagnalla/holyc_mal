@@ -1,5 +1,5 @@
-#ifndef GCTAGS_HC
-#define GCTAGS_HC
+#ifndef GCCOMMON_HC
+#define GCCOMMON_HC
 
 #include "PrimitiveTypes.HC"
 
