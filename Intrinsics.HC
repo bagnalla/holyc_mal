@@ -721,7 +721,6 @@ Malval *_isSequential(Malval *args)
   return MalBoolMk(MalIsListOrVector(MalListNth(args, 1)));
 }
 
-// TODO: figure out how to do this in TempleOS
 Malval *_readLine(Malval *args)
 {
   NullCheck(args, "args");
@@ -731,16 +730,10 @@ Malval *_readLine(Malval *args)
   Malval *m = MalListNth(args, 1);
   String *prompt = StringOfMalval(m);
   CHAR *str = StringCString(prompt);
-  "%s", str;
-  Free(str);
-  String *s = StringEmpty;
-  INT c = StringReadLn(s);
-  if (c == EOF) {
-    return MalNilMk;
-  }
-  else {
-    return MalStringMk(s);
-  }
+  CHAR *response = GetStr(str, NULL, GSF_SHIFT_ESC_EXIT);
+  String *s = StringMk(response);
+  Free(str); Free(response);
+  return MalStringMk(s);
 }
 
 Malval *_meta(Malval *args)

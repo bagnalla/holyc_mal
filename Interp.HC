@@ -723,7 +723,8 @@ INT mal(...)
     check_for_GC;
     "Mal [HolyC]\n";
     while (TRUE) {
-      cstr = GetStr("user> ");
+      cstr = GetStr("user> ", NULL, GSF_SHIFT_ESC_EXIT);
+      if (!cstr) break; // Exit on EOF
       s = StringMk(cstr);
       Free(cstr);
       if (!StringEqC(s, "")) {

@@ -6,6 +6,6 @@
 #define CHAR U8
 #define INT  I64
 
-//#define EOF -1
+#define EOF CH_CTRLD
 
 #endif

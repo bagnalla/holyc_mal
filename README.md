@@ -87,8 +87,10 @@ necessary to write functions in tail-recursive form when it wouldn't be an
 issue in other implementations. I haven't found a way to increase the stack
 size yet -- it may actually require a patch to the HolyC compiler or OS.
 
-I haven't yet found the analogue to ctrl+D in TempleOS, so there is a 'quit!'
-special form for exiting the REPL. Just type '(quit!)'.
+GetStr is a convenient way to get user input, but it doesn't support
+ctrl+d. You can do shift+esc instead, but it kills the entire terminal
+session, so there is also a 'quit!' special form for cleanly exiting
+the REPL without closing the terminal. Just type '(quit!)'.
 
 
 ## Performance benchmarks
