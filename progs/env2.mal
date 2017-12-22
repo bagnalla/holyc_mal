@@ -1,42 +1,39 @@
 ;; env 
 
-(def! bind-env (fn* [env b e]
+(defn bind-env [env b e]
   (if (empty? b)
     env
-
     (if (= "&" (str (first b)))
       (assoc env (str (nth b 1)) e)
-
       (bind-env (assoc env (str (first b)) (first e))
-                (rest b) (rest e))))))
+                (rest b) (rest e)))))
 
-(def! new-env (fn* [& args]
+(defn new-env [& args]
   (if (<= (count args) 1)
     (atom {"--outer--" (first args)})
     (atom (bind-env {"--outer--" (first args)}
-                    (nth args 1) (nth args 2))))))
+                    (nth args 1) (nth args 2)))))
 
-(def! env-find (fn* [env k]
+(defn env-find [env k]
   (let* [ks (str k)
          data @env]
     (if (contains? data ks)
       env
       (if (get data "--outer--")
         (env-find (get data "--outer--") ks)
-        nil)))))
+        nil))))
 
-(def! env-get (fn* [env k]
+(defn env-get [env k]
   (let* [ks (str k)
          e (env-find env ks)]
     (if e
       (get @e ks)
-      (throw (str "'" ks "' not found"))))))
+      (throw (str "'" ks "' not found")))))
 
-(def! env-print (fn* [env]
-  (map (fn* [k] (println k ": " (get @env k))) (keys @env))))
+(defn env-print [env]
+  (map (fn* [k] (println k ": " (get @env k))) (keys @env)))
 
-(def! env-set (fn* [env k v]
+(defn env-set [env k v]
   (do
     (swap! env assoc (str k) v)
-    v)))
-
+    v))

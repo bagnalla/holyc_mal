@@ -1,6 +1,7 @@
 #ifndef INTERP_HC
 #define INTERP_HC
 
+// Disable some compiler warnings.
 Option(OPTf_WARN_UNUSED_VAR, FALSE);
 Option(OPTf_WARN_HEADER_MISMATCH, FALSE);
 
@@ -75,10 +76,10 @@ Malval *quasiquote (Malval *ast)
 	}
 	return MalNth(ast, 1);
       }
-      else goto _quasiquote_l1; // deal with no short-circuiting AND
+      else goto _quasiquote_lbl; // deal with no short-circuiting AND
     }
     else {
-    _quasiquote_l1:
+    _quasiquote_lbl:
       if (IsPair(v)) {
 	v1 = MalHead(v);
 	if (MalIsSymbol(v1)) {
@@ -724,7 +725,6 @@ INT mal(...)
     "Mal [HolyC]\n";
     while (TRUE) {
       cstr = GetStr("user> ", NULL, GSF_SHIFT_ESC_EXIT);
-      if (!cstr) break; // Exit on EOF
       s = StringMk(cstr);
       Free(cstr);
       if (!StringEqC(s, "")) {

@@ -1,3 +1,7 @@
+// NOTE: This version of the lexer is very slow and isn't currently
+// used. See FastLexer.HC for the real one. I may get around to
+// writing a proper lexer generator eventually.
+
 #ifndef LEXER_HC
 #define LEXER_HC
 

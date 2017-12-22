@@ -211,7 +211,6 @@ Malval *_readString(Malval *args)
   }
   catch {
     ReaderDelete(r);
-    /* return throws("parse error in 'read-string'"); */
     "parse error in 'read-string'\n";
     RethrowException; // just to be explicit
   }
@@ -279,7 +278,7 @@ Malval *_reset(Malval *args)
 }
 
 // NOTE: All of the arguments have already been evaluated, so any quoted lists
-// have had the quote stripped off. To aVOID erroneously attempting to evaluate
+// have had the quote stripped off. To avoid erroneously attempting to evaluate
 // quoted lists as function applications when we call EVAL below, we re-quote
 // all lists.
 // EDIT: actually, now everything is being quoted since it's all been evaluated
