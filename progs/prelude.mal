@@ -1,0 +1,143 @@
+;; Prelude library of basic functions.
+
+;; All functions are tail-recursive, but some non-tail-recursive
+;; variants are provided in comments when they are potentially faster
+;; than their tail-recursive counterparts.
+
+(load-file "progs/syntax.mal")
+
+;; Classic synonyms
+(def! car first)
+(def! cdr rest)
+
+;; Reverse a list (tail-recursive).
+(defn reverse "reverse" [l] (f l '())
+  WHERE f
+  (fn*
+   [l acc]
+   (if (empty? l) acc (f (rest l) (cons (first l) acc)))))
+
+;; Convenience synonym
+(def! rev reverse)
+
+;; Tail-recursive drop (fast).
+(defn drop
+  "drop"
+  [n l]
+  (if (or (<= n 0) (empty? l))
+    l
+    (drop (- n 1) (rest l))))
+
+;; Non-tail-recursive take.
+;; (defn take
+;;   "take"
+;;   [n l]
+;;   (if (or (<= n 0) (empty? l))
+;;     '()
+;;     (cons (first l) (take (- n 1) (rest l)))))
+
+;; Tail-recursive take.
+(defn take
+  "take"
+  [n l]
+  (rev (f n l '()))
+  WHERE f
+  (fn*
+   [n l acc]
+   (if (or (<= n 0) (empty? l))
+     acc
+     (f (- n 1) (rest l) (cons (first l) acc)))))
+
+(defn drop-take
+  "drop-take"
+  [n m l]
+  (take m (drop n l)))
+
+;; Tail-recursive.
+(defn drop-while
+  "drop-while"
+  [pred l]
+  (cond
+    (empty? l) l
+    (pred (first l)) (drop-while pred (rest l))
+    "else" l))
+
+;; Non-tail-recursive.
+;; (defn take-while
+;;   "take-while"
+;;   [pred l]
+;;   (if (empty? l)
+;;     l
+;;     (let* [x (first l)]
+;;       (if (pred x)
+;;         (cons x (take-while pred (rest l)))
+;;         '()))))
+
+;; Tail-recursive.
+(defn take-while "take-while" [pred l]
+  (rev (f pred l '()))
+  WHERE f
+  (fn*
+   [pred l acc]
+   (if (empty? l)
+     acc
+     (let* [x (first l)]
+       (if (pred x)
+         (f pred (rest l) (cons x acc))
+         acc)))))
+
+;; Non-tail-recursive.
+;; (defn filter
+;;   "filter"
+;;   [pred l]
+;;   (if (empty? l)
+;;     l
+;;     (let* [x (first l)]
+;;       (if (pred x)
+;;         (cons x (filter pred (rest l)))
+;;         (filter pred (rest l))))))
+
+;; Tail-recursive.
+(defn filter "filter" [pred l]
+  (rev (f pred l '()))
+  WHERE f
+  (fn*
+   [pred l acc]
+   (if (empty? l)
+     l
+     (let* [x (first l)]
+       (f (rest l) (if (pred x) (cons x acc) acc))))))
+
+;; Tail-recursive.
+(defn some
+  "some"
+  [pred l]
+  (if (empty? l)
+    false
+    (if (pred (first l))
+      true
+      (some pred (rest l)))))
+
+;; List of integers in the interval [start, end).
+;; Tail-recursive.
+(defn range
+  "range"
+  [start end]
+  (f start (- end 1) '())
+  WHERE f
+  (fn*
+   [a b acc]
+   (if (< b a) acc (f a (- b 1) (cons b acc)))))
+
+
+;; TODO
+
+;; (defn reduce
+;;   "reduce"
+;; (def! fold reduce)
+
+;; (defn sort
+;;   "sort"
+
+;; (defn sort-by
+;;   "sort-by"

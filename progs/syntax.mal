@@ -1,0 +1,205 @@
+
+;; Internal drop function that doesn't use defn.
+(def! _drop
+  (fn*
+   [n l]
+   (if (or (<= n 0) (empty? l))
+     l
+     (_drop (- n 1) (rest l)))))
+
+;; Return true if 'sym' appears anywhere in 'form'.
+(def! _find-symbol-in-form
+  (fn*
+   [sym form]
+   (if (sequential? form)
+     (if (empty? form)
+       false
+       (or (_find-symbol-in-form sym (first form))
+           (_find-symbol-in-form sym (rest form))))
+     (= sym form))))
+
+;; Ensure the generated symbol does not appear in the given form.
+;; Mal's gensym isn't guaranteed to generate symbols never seen by the
+;; reader :(.
+(def! _gen-fresh-sym
+  (fn*
+   [form]
+   (let* [sym (gensym)]
+     (if (_find-symbol-in-form sym form) (_gen-fresh_sym) sym))))
+
+;; Given a symbol and a sequence of sub-symbols (the "match" pattern),
+;; construct a list of let-binding pairs to bind each sub-symbol to a
+;; part of the original. E.g., if 'sym' is 'G__0' and 'pattern' is [x
+;; & y], this function returns [x (nth G__0 0) y (drop 1 G__0)]. The
+;; intention is that G__0 is being used in place of the pattern in the
+;; actual argument/binder list, and the let-bindings can be used to
+;; deconstruct and rebind the argument as described by the pattern.
+(def! _destructure-pattern
+  (fn*
+   [sym pattern form n]
+   (if (empty? pattern)
+     '()
+     (let* [hd (first pattern)
+            tl (rest  pattern)]
+       (if (= hd '&)
+         (if (empty? tl)
+           (do (println ("_destructure-pattern: naked '&'")) (throw nil))
+           (let* [hd (first tl)
+                  accessor (cond
+                             (= n 0) sym
+                             (= n 1) `(rest ~sym)
+                             "else" `(_drop ~n ~sym))]
+             (if (sequential? hd)
+               (let* [sub-sym (_gen-fresh-sym form)
+                      sub-binds (_destructure-pattern sub-sym hd form 0)]
+                 (concat `(~sub-sym ~accessor) sub-binds))
+               `(~hd ~accessor))))
+         (let* [rest-bindings (_destructure-pattern sym tl form (+ n 1))
+                accessor (if (= n 0) `(first ~sym) `(nth ~sym ~n))]
+           (if (sequential? hd)
+             (let* [sub-sym   (_gen-fresh-sym form)
+                    sub-binds (_destructure-pattern sub-sym hd form 0)]
+               (concat (concat `(~sub-sym ~accessor) sub-binds)
+                       rest-bindings))
+             (concat `(~hd ~accessor) rest-bindings))))))))
+
+;; Take a list of let-binds of the form [p1 val1 p2 val2 ...] where
+;; p1, p2 may be destruct patterns and translate it to a list of
+;; let-binds that is compatible with the primitive 'let*' special
+;; form (no patterns). The 'all' parameter should include the binds
+;; themselves as well as the body of the let form in order to ensure
+;; all freshly generated symbols don't collide with anything.
+(def! _destructure-let-binds
+  (fn*
+   [binds all]
+   (if (empty? binds)
+     '()
+     (let* [hd         (first binds)
+            r          (rest binds)
+            v          (first r)
+            rest-binds (_destructure-let-binds (rest r) all)]
+       (if (sequential? hd)
+         (let* [sym (_gen-fresh-sym binds)
+                new-binds (_destructure-pattern sym hd binds 0)]
+           (cons sym (cons v (concat new-binds rest-binds))))
+         (cons hd (cons v rest-binds))
+         )))))
+
+;; A 'let' form that allows destructuring patterns for
+;; lists/vectors. This is strictly more general than the primitive
+;; 'let*' special form so it can safely be used in its place, but it's
+;; slower so 'let*' should be preferred when patterns aren't needed.
+(defmacro! let
+  (fn*
+   [binds body]
+   (let* [new-binds (_destructure-let-binds binds [binds body])]
+     `(let* ~new-binds ~body))))
+
+;; Given a parameter binder list for a function, construct a new
+;; binder list in which all patterns are replaced by freshly generated
+;; symbols, and a list of let-bindings to be placed at the beginning
+;; of the function body to appropriately bind the pattern ids to their
+;; respective parts of the arguments. The 'body' parameter should be
+;; the body of the function so we can ensure that the generated
+;; symbols don't collide with anything.
+(def! _destructure-args
+  (fn*
+   [binders body]
+   (if (empty? binders)
+     '(() ())
+     (let* [hd (first binders)
+            acc (_destructure-args (rest binders) body)
+            acc-syms (first acc)
+            acc-bindings (nth acc 1)]
+       (if (sequential? hd)
+         (let* [sym (_gen-fresh-sym body)]
+           (list (cons sym acc-syms)
+                 (concat (_destructure-pattern sym hd body 0)
+                         acc-bindings)))
+         (list (cons hd acc-syms) acc-bindings))))))
+
+;; Assumes input is nonnegative but returns true for all negative
+;; numbers rather than diverging.
+(def! _is-even
+  (fn*
+   [n]
+   (cond
+     (<= n 0) true
+     (= n 1) false
+     "else" (_is-even (- n 2))
+     )))
+
+(def! _defn-extra-binds
+  (fn*
+   [extra]
+   (if (empty? extra)
+     '()
+     (if (= (first extra) 'WHERE)
+       (let* [clauses (rest extra)]
+         (if (or (= (count clauses) 0)
+                 (not (_is-even (count clauses))))
+           (do (println "defn macro: ill-formed WHERE clause")
+               (throw nil))
+           clauses))
+       (do (println "defn macro: expected WHERE clause")
+           (throw nil))))))
+
+(def! _defn-aux
+  (fn*
+   [name docstring forms]
+   (let* [args (first forms)
+          body (first (rest forms))
+          extra (rest (rest forms))
+          destructured (_destructure-args args (rest forms))
+          new-args (first destructured)
+          binds (nth destructured 1)
+          extra-binds (_defn-extra-binds extra)
+          final-binds (concat binds extra-binds)]
+     `(def! ~name
+        (with-meta
+          ~(if (empty? final-binds)
+             `(fn* ~args ~body)
+             `(fn* ~new-args (let* ~final-binds ~body)))
+          ~docstring)))))
+
+;; Clojure-inspired syntax for defining functions. Supports
+;; docstrings, argument destructuring, and WHERE clauses a la
+;; Haskell. No multiple arities (yet?).
+(defmacro! defn
+  (fn*
+   [name & args]
+   (let* [n (count args)]
+     (if (< n 2)
+       (do (println "defn macro: not enough arguments") (throw nil))
+       (let* [hd (first args)
+              tl (rest args)]
+         (if (string? hd)
+           (if (< n 3)
+             (do (println "defn macro: not enough arguments")
+                 (throw nil))
+             (_defn-aux name hd tl))
+           (_defn-aux name nil args)))))))
+
+;; This and the 'or' macro built in to the interpreter are still
+;; potentially leaky if the user just happens to use a weird variable
+;; name like G__21 in their code. We could use _gen-fresh-sym (and
+;; redefine 'or' using it) but we leave them leaky for now.
+(defmacro! and
+  (fn*
+   [& xs]
+   (if (empty? xs)
+     nil
+     (if (= 1 (count xs))
+       (first xs)
+       (let* [condvar (gensym)]
+         `(let* (~condvar ~(first xs))
+            (if ~condvar
+              (and ~@(rest xs))
+              ~condvar)))))))
+
+;; TODO: multiple arities for defn? Not a big priority.
+
+;; (defmacro! when
+
+;; run the given form and print the time elapsed
+;; (defmacro! time

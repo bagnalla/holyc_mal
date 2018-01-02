@@ -594,12 +594,12 @@ Malval *EVAL(Env *env, Malval *ast)
 	      ast = body;
 	      goto RESTART_EVAL_LOOP;
 	    }
-	      
+
 	    default:
 	      /* "unknown function tag: %d\n", v1->_fun->_tag; */
 	      throws("unknown function tag");
 	    }
-	    
+
 	  }
 	  else { // error - can't apply a non function
 	    tag = PrintMalval(v1, TRUE, TRUE);
@@ -677,7 +677,7 @@ BOOL rep(Env *env, String *s, BOOL print)
 INT mal(...)
 {
   init_GC;
-  
+
   String *s = StringEmpty;
   Env *env = _init_env;
 

@@ -1,32 +1,7 @@
 ;; A Mal interpreter written in Mal itself. Originally written by Joel
 ;; Martin (kanaka) and modified by Alexander Bagnall (bagnalla).
 
-;; Clojure syntax for defining functions (minus the doc string).
-;; (defmacro! defn (fn* [name args body] `(def! ~name (fn* ~args ~body))))
-
-;; Clojure syntax for defining functions.
-(defmacro! defn
-  (fn* [name & args]
-       (cond
-         (= (count args) 2)
-         (if (sequential? (nth args 0))
-           `(def! ~name (fn* ~(nth args 0) ~(nth args 1)))
-           (do (println "defn macro: expected list or vector for args")
-               (throw "")))
-
-         (= (count args) 3)
-         (cond
-           (not (string? (nth args 0)))
-           (do (println "defn macro: expected string for doc metadata")
-               (throw ""))
-           (not (sequential? (nth args 1)))
-           (do (println "defn macro: expected list or vector for args")
-               (throw ""))
-           "else"
-           `(def! ~name
-              (with-meta
-                (fn* ~(nth args 1) ~(nth args 2)) ~(nth args 0)))))))
-
+(load-file "progs/syntax.mal")
 (load-file "progs/env2.mal")
 (load-file "progs/core.mal")
 
