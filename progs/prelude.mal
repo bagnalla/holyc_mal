@@ -4,6 +4,9 @@
 ;; variants are provided in comments when they are potentially faster
 ;; than their tail-recursive counterparts.
 
+;; Safety and simplicity take priority, so some performance is
+;; sacrificed to reduce the likelihood of stack overflow.
+
 (load-file "progs/syntax.mal")
 
 ;; Classic synonyms
@@ -12,15 +15,13 @@
 
 ;; Reverse a list (tail-recursive).
 (defn reverse "reverse" [l] (f l '())
-  WHERE f
-  (fn*
-   [l acc]
-   (if (empty? l) acc (f (rest l) (cons (first l) acc)))))
-
-;; Convenience synonym
+  WHERE
+  f (fn*
+     [l acc]
+     (if (empty? l) acc (f (rest l) (cons (first l) acc)))))
 (def! rev reverse)
 
-;; Tail-recursive drop (fast).
+;; Tail-recursive drop.
 (defn drop
   "drop"
   [n l]
@@ -37,21 +38,15 @@
 ;;     (cons (first l) (take (- n 1) (rest l)))))
 
 ;; Tail-recursive take.
-(defn take
-  "take"
-  [n l]
-  (rev (f n l '()))
-  WHERE f
-  (fn*
-   [n l acc]
-   (if (or (<= n 0) (empty? l))
-     acc
-     (f (- n 1) (rest l) (cons (first l) acc)))))
+(defn take "take" [n l] (rev (f n l '()))
+  WHERE
+  f (fn*
+     [n l acc]
+     (if (or (<= n 0) (empty? l))
+       acc
+       (f (- n 1) (rest l) (cons (first l) acc)))))
 
-(defn drop-take
-  "drop-take"
-  [n m l]
-  (take m (drop n l)))
+(defn drop-take "drop-take" [n m l] (take m (drop n l)))
 
 ;; Tail-recursive.
 (defn drop-while
@@ -62,7 +57,7 @@
     (pred (first l)) (drop-while pred (rest l))
     "else" l))
 
-;; Non-tail-recursive.
+;; Not tail-recursive.
 ;; (defn take-while
 ;;   "take-while"
 ;;   [pred l]
@@ -74,19 +69,18 @@
 ;;         '()))))
 
 ;; Tail-recursive.
-(defn take-while "take-while" [pred l]
-  (rev (f pred l '()))
-  WHERE f
-  (fn*
-   [pred l acc]
-   (if (empty? l)
-     acc
-     (let* [x (first l)]
-       (if (pred x)
-         (f pred (rest l) (cons x acc))
-         acc)))))
+(defn take-while "take-while" [pred l] (rev (f pred l '()))
+  WHERE
+  f (fn*
+     [pred l acc]
+     (if (empty? l)
+       acc
+       (let* [x (first l)]
+         (if (pred x)
+           (f pred (rest l) (cons x acc))
+           acc)))))
 
-;; Non-tail-recursive.
+;; Not tail-recursive.
 ;; (defn filter
 ;;   "filter"
 ;;   [pred l]
@@ -98,15 +92,14 @@
 ;;         (filter pred (rest l))))))
 
 ;; Tail-recursive.
-(defn filter "filter" [pred l]
-  (rev (f pred l '()))
-  WHERE f
-  (fn*
-   [pred l acc]
-   (if (empty? l)
-     l
-     (let* [x (first l)]
-       (f (rest l) (if (pred x) (cons x acc) acc))))))
+(defn filter "filter" [pred l] (rev (f pred l '()))
+  WHERE
+  f (fn*
+     [pred l acc]
+     (if (empty? l)
+       l
+       (let* [x (first l)]
+         (f (rest l) (if (pred x) (cons x acc) acc))))))
 
 ;; Tail-recursive.
 (defn some
@@ -120,21 +113,42 @@
 
 ;; List of integers in the interval [start, end).
 ;; Tail-recursive.
-(defn range
-  "range"
-  [start end]
-  (f start (- end 1) '())
-  WHERE f
-  (fn*
-   [a b acc]
-   (if (< b a) acc (f a (- b 1) (cons b acc)))))
+(defn range "range" [start end] (f start (- end 1) '())
+  WHERE
+  f (fn*
+     [a b acc]
+     (if (< b a) acc (f a (- b 1) (cons b acc)))))
+
+;; Left-associative reduce/fold. The initial value is not
+;; optional. Tail-recursive.
+(defn reduce
+  "reduce"
+  [f acc l]
+  (if (empty? l)
+    acc
+    (reduce f (f acc (first l)) (rest l))))
+(def! fold reduce)
+(def! foldl reduce)
+
+;; Right-associative reduce/fold. The initial value is not
+;; optional. Not tail-recursive.
+;; (defn reduce-r
+;;   "reduce-r"
+;;   [f l acc]
+;;   (if (empty? l)
+;;     acc
+;;     (f (first l) (reduce-r f (rest l) acc))))
+
+;; Right-associative reduce/fold. The initial value is not
+;; optional. Tail-recursive.
+(defn reduce-r
+  "reduce-r"
+  [f acc l]
+  (fold f acc (rev l)))
+(def! foldr reduce-r)
 
 
 ;; TODO
-
-;; (defn reduce
-;;   "reduce"
-;; (def! fold reduce)
 
 ;; (defn sort
 ;;   "sort"

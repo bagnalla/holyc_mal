@@ -50,12 +50,12 @@
                              (= n 1) `(rest ~sym)
                              "else" `(_drop ~n ~sym))]
              (if (sequential? hd)
-               (let* [sub-sym (_gen-fresh-sym form)
+               (let* [sub-sym   (_gen-fresh-sym form)
                       sub-binds (_destructure-pattern sub-sym hd form 0)]
                  (concat `(~sub-sym ~accessor) sub-binds))
                `(~hd ~accessor))))
          (let* [rest-bindings (_destructure-pattern sym tl form (+ n 1))
-                accessor (if (= n 0) `(first ~sym) `(nth ~sym ~n))]
+                accessor      (if (= n 0) `(first ~sym) `(nth ~sym ~n))]
            (if (sequential? hd)
              (let* [sub-sym   (_gen-fresh-sym form)
                     sub-binds (_destructure-pattern sub-sym hd form 0)]
@@ -79,7 +79,7 @@
             v          (first r)
             rest-binds (_destructure-let-binds (rest r) all)]
        (if (sequential? hd)
-         (let* [sym (_gen-fresh-sym binds)
+         (let* [sym       (_gen-fresh-sym binds)
                 new-binds (_destructure-pattern sym hd binds 0)]
            (cons sym (cons v (concat new-binds rest-binds))))
          (cons hd (cons v rest-binds))
@@ -107,9 +107,9 @@
    [binders body]
    (if (empty? binders)
      '(() ())
-     (let* [hd (first binders)
-            acc (_destructure-args (rest binders) body)
-            acc-syms (first acc)
+     (let* [hd           (first binders)
+            acc          (_destructure-args (rest binders) body)
+            acc-syms     (first acc)
             acc-bindings (nth acc 1)]
        (if (sequential? hd)
          (let* [sym (_gen-fresh-sym body)]
@@ -144,41 +144,40 @@
        (do (println "defn macro: expected WHERE clause")
            (throw nil))))))
 
-(def! _defn-aux
-  (fn*
-   [name docstring forms]
-   (let* [args (first forms)
-          body (first (rest forms))
-          extra (rest (rest forms))
-          destructured (_destructure-args args (rest forms))
-          new-args (first destructured)
-          binds (nth destructured 1)
-          extra-binds (_defn-extra-binds extra)
-          final-binds (concat binds extra-binds)]
-     `(def! ~name
-        (with-meta
-          ~(if (empty? final-binds)
-             `(fn* ~args ~body)
-             `(fn* ~new-args (let* ~final-binds ~body)))
-          ~docstring)))))
-
 ;; Clojure-inspired syntax for defining functions. Supports
 ;; docstrings, argument destructuring, and WHERE clauses a la
 ;; Haskell. No multiple arities (yet?).
 (defmacro! defn
-  (fn*
-   [name & args]
-   (let* [n (count args)]
-     (if (< n 2)
-       (do (println "defn macro: not enough arguments") (throw nil))
-       (let* [hd (first args)
-              tl (rest args)]
-         (if (string? hd)
-           (if (< n 3)
-             (do (println "defn macro: not enough arguments")
-                 (throw nil))
-             (_defn-aux name hd tl))
-           (_defn-aux name nil args)))))))
+  (let* [aux
+         (fn*
+          [name docstring forms]
+          (let* [args         (first forms)
+                 body         (first (rest forms))
+                 extra        (rest (rest forms))
+                 destructured (_destructure-args args (rest forms))
+                 new-args     (first destructured)
+                 binds        (nth destructured 1)
+                 extra-binds  (_defn-extra-binds extra)
+                 final-binds  (concat binds extra-binds)]
+            `(def! ~name
+               (with-meta
+                 ~(if (empty? final-binds)
+                    `(fn* ~args ~body)
+                    `(fn* ~new-args (let* ~final-binds ~body)))
+                 ~docstring))))]
+    (fn*
+     [name & args]
+     (let* [n (count args)]
+       (if (< n 2)
+         (do (println "defn macro: not enough arguments") (throw nil))
+         (let* [hd (first args)
+                tl (rest args)]
+           (if (string? hd)
+             (if (< n 3)
+               (do (println "defn macro: not enough arguments")
+                   (throw nil))
+               (aux name hd tl))
+             (aux name nil args))))))))
 
 ;; This and the 'or' macro built in to the interpreter are still
 ;; potentially leaky if the user just happens to use a weird variable
@@ -197,9 +196,22 @@
               (and ~@(rest xs))
               ~condvar)))))))
 
+;; Evaluate the given form and print the time elapsed.
+(defmacro! time
+  (fn*
+   [f]
+   `(let [start-time (time-ms)
+          result     ~f
+          end-time   (time-ms)]
+      (do (prn result) (prn (str (- end-time start-time) " ms"))))))
+
+;; If b is true, evaluate the remaining arguments in a 'do'.
+(defmacro! when
+  (fn*
+   [b & forms]
+   `(if ~b (do ~@forms))))
+
+
 ;; TODO: multiple arities for defn? Not a big priority.
 
-;; (defmacro! when
-
-;; run the given form and print the time elapsed
-;; (defmacro! time
+;; loop ?
