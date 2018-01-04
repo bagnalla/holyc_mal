@@ -1,0 +1,2 @@
+# Highlight HolyC as C
+*.HC linguist-language=C
