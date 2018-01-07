@@ -62,23 +62,33 @@ List *ListCopy(List *l)
   }
 }
 
+// Non-recursive to avoid stack overflow during GC.
 extern VOID GC_mark_object(GCCommon *o);
 VOID ListGCMark(GCCommon *list)
 {
   List *l = list(List*);
-  if (!l->_reachable) {
-    l->_reachable = TRUE;
-    switch (l->_tag) {
-    case LIST_NIL:
-      break;
-    case LIST_CONS:
-      GC_mark_object(l->_head);
-      ListGCMark(l->_tail(GCCommon*));
-      break;
-    default:
-      throws("ListGCMark: unknown list tag");
-    }
+  List *cur  = l;
+  while (TRUE) {
+    if (cur->_reachable) break;
+    cur->_reachable = TRUE;
+    if (cur->_tag == LIST_NIL) break;
+    GC_mark_object(cur->_head);
+    cur = cur->_tail;
   }
+  // Old recursive code
+  /* if (!l->_reachable) { */
+  /*   l->_reachable = TRUE; */
+  /*   switch (l->_tag) { */
+  /*   case LIST_NIL: */
+  /*     break; */
+  /*   case LIST_CONS: */
+  /*     GC_mark_object(l->_head); */
+  /*     ListGCMark(l->_tail(GCCommon*)); */
+  /*     break; */
+  /*   default: */
+  /*     throws("ListGCMark: unknown list tag"); */
+  /*   } */
+  /* } */
 }
 
 List *_listFromPArray_aux(PArray *pa, INT i)
