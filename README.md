@@ -58,7 +58,7 @@ mal("prog.mal");
 
 All tests pass and self-hosting is successful
 ([dramatized demonstration](https://www.youtube.com/watch?v=tbr-j2_zhgU)).
-The only real thing missing at the moment is HolyC interop. 
+The only important thing missing at the moment is HolyC interop.
 
 The garbage collector uses a simple mark and sweep strategy, using the
 global environment as the root. Some cooperation from other parts of the code
@@ -73,10 +73,10 @@ Brzozowski derivatives rather than finite automata.
 Array.HC provides a generic dynamic array which is used internally by PArray
 (arrays of pointers), and String.
 
-Lists are implemented with a simple cons/nil linked list. Hashmaps are
-just association lists (but backed by arrays), so performance could probably be
-improved by implementing actual hash tables or some balanced binary tree
-structure with string interning.
+Lists are implemented with cons cells. Hashmaps are just association
+lists (but backed by arrays), so performance could probably be
+improved by implementing actual hash tables or some balanced binary
+tree structure with string interning.
 
 There are a bunch of "unnecessary" safety checks for null pointers, but they're
 useful for debugging.

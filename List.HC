@@ -75,6 +75,16 @@ VOID ListGCMark(GCCommon *list)
     GC_mark_object(cur->_head);
     cur = cur->_tail;
   }
+
+  // Less ugly way but maybe slightly less efficient.
+  /* while (!ListIsNil(cur)) { */
+  /*   if (cur->_reachable) break; */
+  /*   cur->_reachable = TRUE; */
+  /*   GC_mark_object(cur->_head); */
+  /*   cur = cur->_tail; */
+  /* } */
+  /* cur->_reachable = TRUE; */
+
   // Old recursive code
   /* if (!l->_reachable) { */
   /*   l->_reachable = TRUE; */

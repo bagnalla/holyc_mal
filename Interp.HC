@@ -18,6 +18,11 @@ Option(OPTf_WARN_HEADER_MISMATCH, FALSE);
 #include "Reader.HC"
 #include "String.HC"
 
+// Keep track of recursion depth during evaluation and throw an
+// exception if it exceeds the maximum.
+#define MAX_RECURSION_DEPTH 400
+INT recur_counter;
+
 Malval *READ(String *s)
 {
   Reader *r = ReaderMk;
@@ -324,6 +329,9 @@ Malval *EVAL(Env *env, Malval *ast)
   Exception *e;
   Closure *clos;
   PArray *binds_arr;
+  if (++recur_counter > MAX_RECURSION_DEPTH) {
+    return throws("Reached maximum recursion depth.");
+  }
   while (TRUE) {
   BEGIN_EVAL_LOOP:;
     /* StringPrintLn(PrintMalval(ast, TRUE, TRUE)); */
@@ -623,6 +631,7 @@ Malval *EVAL(Env *env, Malval *ast)
   }
  EXIT_EVAL_LOOP:
   GC_pop; GC_pop;
+  --recur_counter;
   return eval_result;
  RESTART_EVAL_LOOP:
   GC_pop; GC_pop;
@@ -656,6 +665,7 @@ BOOL rep(Env *env, String *s, BOOL print)
   BOOL exit = FALSE;
   try {
     ast_in = READ(s);
+    recur_counter = 0;
     ast_out = EVAL(env, ast_in);
     if (print) {
       res = PRINT(ast_out);
