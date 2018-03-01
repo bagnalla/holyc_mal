@@ -92,6 +92,13 @@ ctrl+d. You can do shift+esc instead, but it kills the entire terminal
 session, so there is also a 'quit!' special form for cleanly exiting
 the REPL without closing the terminal. Just type '(quit!)'.
 
+### HolyC interop
+
+There are now two built-in functions to support HolyC interop:
+* run-holyc: JIT compile and run a HolyC source file.
+* load-extern: look up a function in the current task's symbol table and create a closure pointing to it.
+
+The intention is to use 'run-holyc' to compile a source file containing function definitions, and then use 'load-extern' to reify them into first-class Mal values. External functions must take a list of Malvals as the argument and return a Malval. See extern/test.HC or any of the functions in Intrinsics.HC for an example. 'run-holyc' is obviously not safe since it allows execution of arbitrary HolyC code, so use at your own peril.
 
 ## Performance benchmarks
 Running in a VirtualBox VM. CPU is i7-4790k.
