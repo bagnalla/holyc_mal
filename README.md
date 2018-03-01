@@ -59,32 +59,33 @@ mal("prog.mal");
 All tests pass and self-hosting is successful
 ([dramatized demonstration](https://www.youtube.com/watch?v=tbr-j2_zhgU)).
 
-The garbage collector uses a simple mark and sweep strategy, using the
-global environment as the root. Some cooperation from other parts of the code
-is necessary, however. Since we must allow garbage collection to run during
-evaluation of terms (e.g., when self-hosting, the main term never terminates),
-intermediate values not reachable from the global environment must be pushed
-onto a special GC stack to prevent them from being erroneously collected.
+The garbage collector uses a simple mark and sweep strategy with the
+global environment as the root. It requires some cooperation from
+other parts of the code: since we must allow garbage collection to run
+during evaluation of terms (e.g., when self-hosting, the main term
+never terminates), intermediate values not reachable from the global
+environment must be pushed onto a special GC stack to prevent them
+from being erroneously collected.
 
 There is a rudimentary regular expression engine in Regex.HC based on
 Brzozowski derivatives rather than finite automata.
 
-Array.HC provides a generic dynamic array which is used internally by PArray
-(arrays of pointers), and String.
+Array.HC provides a generic dynamic array which is used internally by
+PArray (arrays of pointers), and String.
 
 Lists are implemented with cons cells. Hashmaps are just association
 lists (but backed by arrays), so performance could probably be
 improved by implementing actual hash tables or some balanced binary
 tree structure with string interning.
 
-There are a bunch of "unnecessary" safety checks for null pointers, but they're
-useful for debugging.
+There are a bunch of "unnecessary" safety checks for null pointers,
+but they're useful for debugging.
 
 One problem is that the call stack for programs is relatively small in
-TempleOS, so the maximum recursion depth is limited. It may sometimes be
-necessary to write functions in tail-recursive form when it wouldn't be an
-issue in other implementations. I haven't found a way to increase the stack
-size yet -- it may actually require a patch to the HolyC compiler or OS.
+TempleOS, so the maximum recursion depth is limited. It may sometimes
+be necessary to write functions in tail-recursive form when it
+wouldn't be an issue in other implementations. I haven't found a way
+to increase the stack size yet.
 
 GetStr is a convenient way to get user input, but it doesn't support
 ctrl+d. You can do shift+esc instead, but it kills the entire terminal
@@ -97,7 +98,13 @@ There are now two built-in functions to support HolyC interop:
 * run-holyc: JIT compile and run a HolyC source file.
 * load-extern: look up a function in the current task's symbol table and create a closure pointing to it.
 
-The intention is to use 'run-holyc' to compile a source file containing function definitions, and then use 'load-extern' to reify them into first-class Mal values. External functions must take a list of Malvals as the argument and return a Malval. See extern/test.HC or any of the functions in Intrinsics.HC for an example. 'run-holyc' is obviously not safe since it allows execution of arbitrary HolyC code, so use at your own peril.
+The intention is to use 'run-holyc' to compile a source file
+containing function definitions, and then use 'load-extern' to reify
+them into first-class Mal values. An external function must take a
+list of Malvals as the argument and return a Malval. See
+extern/test.HC or any of the functions in Intrinsics.HC for an
+example. 'run-holyc' is obviously not safe since it allows execution
+of arbitrary HolyC code, so use at your own peril.
 
 ## Performance benchmarks
 Running in a VirtualBox VM. CPU is i7-4790k.
