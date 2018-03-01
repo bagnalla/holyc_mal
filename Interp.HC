@@ -19,7 +19,8 @@ Option(OPTf_WARN_HEADER_MISMATCH, FALSE);
 #include "String.HC"
 
 // Keep track of recursion depth during evaluation and throw an
-// exception if it exceeds the maximum.
+// exception if it exceeds the maximum. We REALLY want to avoid
+// overflowing the stack in TempleOS.
 #define MAX_RECURSION_DEPTH 400
 INT recur_counter;
 

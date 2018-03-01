@@ -42,6 +42,10 @@ class Atom
   };
 };
 
+// "Closure" here is a bit of a misnomer since there is no environment
+// (the "Fun" class below is more of a closure). This is simply a
+// user-defined function -- a list of argument symbols and an
+// expression in which they may appear.
 class Closure
 {
   BOOL _is_macro;
@@ -49,21 +53,25 @@ class Closure
   Malval *_body;   // the function body
 };
 
+// This is the runtime value of functions. A lexical closure
+// environment is bundled with either a pointer to a primitive
+// function or a "Closure" value representing a user-defined function.
 class Fun
 {
   CHAR _tag;
   Env *_env;
   union {
-    /* CHAR *_f;       // pointer to built-in function (INTRINSIC) */
-    Malval*(*_f)(Malval*);
+    Malval*(*_f)(Malval*); // pointer to built-in function (INTRINSIC)
     Closure *_clos; // pointer to function closure  (USER)
   };
 };
 
+// The type of runtime values. Just a tagged union with an extra
+// metadata field and a couple fields used for garbage collection.
 class Malval
 {
   BOOL _reachable; // for GC
-  CHAR  _gc_tag;
+  CHAR _gc_tag;
   CHAR _tag;
   Malval *_metadata;
   union {
@@ -72,7 +80,7 @@ class Malval
     List *_list; // list
     Fun *_fun;
     Hashmap *_hash;
-    Malval *_ref; // Used for meta as well
+    Malval *_ref;
   };
 };
 

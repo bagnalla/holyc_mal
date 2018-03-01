@@ -68,6 +68,8 @@ Env *_ns(Env *env)
   EnvSet(ns, StringMk("fn?"),         MalFunIntrinsicMk(env, &_isFunction));
   EnvSet(ns, StringMk("macro?"),      MalFunIntrinsicMk(env, &_isMacro));
   EnvSet(ns, StringMk("seq"),         MalFunIntrinsicMk(env, &_seq));
+  EnvSet(ns, StringMk("run-holyc"),   MalFunIntrinsicMk(env, &_runHolyC));
+  EnvSet(ns, StringMk("load-extern"), MalFunIntrinsicMk(env, &_loadExtern));
   return ns;
 }
 

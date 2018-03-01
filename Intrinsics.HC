@@ -865,4 +865,43 @@ Malval *_seq(Malval *args)
   }
 }
 
+Malval *_runHolyC(Malval *args)
+{
+  NullCheck(args, "args");
+  if (MalListSize(args) != 2) {
+    return throws("'run-holyc' requires exactly one argument");
+  }
+  Malval *v = MalListNth(args, 1);
+  if (!MalIsString(v)) {
+    return throws("'run-holyc' argument must be a string");
+  }
+  String *s = StringOfMalval(v);
+  CHAR *c = StringCString(s);
+  ExeFile(c);
+  Free(c);
+  return MalNilMk();
+}
+
+Malval *_loadExtern(Malval *args)
+{
+  NullCheck(args, "args");
+  if (MalListSize(args) != 2) {
+    return throws("'load-extern' requires exactly one argument");
+  }
+  Malval *v = MalListNth(args, 1);
+  if (!MalIsString(v)) {
+    return throws("'load-extern' argument must be a string");
+  }
+  String *s = StringOfMalval(v);
+  CHAR *c = StringCString(s);
+  CHashFun *f = HashFind(c, Fs->hash_table, HTT_FUN);
+  Free(c);
+  if (f) {
+    return MalFunIntrinsicMk(EnvEmpty(NULL), f->exe_addr);
+  }
+  else {
+    return throws("external function not found");
+  }
+}
+
 #endif
