@@ -58,7 +58,6 @@ mal("prog.mal");
 
 All tests pass and self-hosting is successful
 ([dramatized demonstration](https://www.youtube.com/watch?v=tbr-j2_zhgU)).
-The only important thing missing at the moment is HolyC interop.
 
 The garbage collector uses a simple mark and sweep strategy, using the
 global environment as the root. Some cooperation from other parts of the code
