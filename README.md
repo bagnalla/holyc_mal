@@ -67,8 +67,8 @@ never terminates), intermediate values not reachable from the global
 environment must be pushed onto a special GC stack to prevent them
 from being erroneously collected.
 
-There is a rudimentary regular expression engine in Regex.HC based on
-Brzozowski derivatives rather than finite automata.
+There's a rudimentary regular expression engine in Regex.HC based on
+Brzozowski derivatives (no finite automata).
 
 Array.HC provides a generic dynamic array which is used internally by
 PArray (arrays of pointers), and String.
