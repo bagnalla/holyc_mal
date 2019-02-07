@@ -18,7 +18,7 @@ sudo docker run -it --privileged --rm -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp
 If you see something like "could not initialize SDL", run the command `xhost +`
 and try again. Afterward, do `xhost -` to restore the original setting.
 
-If you don't wish to use the Docker image, you can follow the steps below.
+If you don't want to use Docker, follow the steps below for manual setup.
 
 ## Installation
 
