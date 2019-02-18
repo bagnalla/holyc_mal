@@ -62,7 +62,7 @@ All tests pass and self-hosting is successful
 The garbage collector uses a simple mark and sweep strategy with the
 global environment as the root. It requires some cooperation from
 other parts of the code: since we must allow garbage collection to run
-during evaluation of terms (e.g., when self-hosting, the main term
+during evaluation of terms (e.g., when self-interpreting, the main term
 never terminates), intermediate values not reachable from the global
 environment must be pushed onto a special GC stack to prevent them
 from being erroneously collected.
