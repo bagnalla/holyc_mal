@@ -56,7 +56,7 @@ mal("prog.mal");
 
 ## Implementation info
 
-All tests pass and self-hosting is successful
+All tests pass and self-interpreting is successful
 ([dramatized demonstration](https://www.youtube.com/watch?v=tbr-j2_zhgU)).
 
 The garbage collector uses a simple mark and sweep strategy with the
@@ -94,11 +94,11 @@ the REPL without closing the terminal. Just type '(quit!)'.
 
 ### HolyC interop
 
-There are now two built-in functions to support HolyC interop:
+There are two built-in functions to support HolyC interop:
 * run-holyc: JIT compile and run a HolyC source file.
 * load-extern: look up a function in the current task's symbol table and create a closure pointing to it.
 
-The intention is to use 'run-holyc' to compile a source file
+The intent is to use 'run-holyc' to compile a source file
 containing function definitions, and then use 'load-extern' to reify
 them into first-class Mal values. An external function must take a
 list of Malvals as the argument and return a Malval. See
