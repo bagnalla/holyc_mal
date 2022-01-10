@@ -1,5 +1,2 @@
-# Highlight HolyC as C
-*.HC linguist-language=C
-
 # Highlight Mal as Clojure
 *.mal linguist-language=clojure
